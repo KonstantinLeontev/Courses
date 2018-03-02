@@ -19,7 +19,7 @@ protected:
 public:
 	OrderedBinaryTree() : m_pHead(NULL) {}
 	OrderedBinaryTree(const OrderedBinaryTree &other);
-	~OrderedBinaryTree(delete m_pHead; m_pHead = NULL;);
+	~OrderedBinaryTree() { delete m_pHead; m_pHead = NULL; }
 
 	void AddElement(const T &newKey);
 	bool RemoveElement(const T &key);
@@ -31,30 +31,33 @@ public:
 	operator=(const OrderedBinaryTree &rhs);
 	operator<<(const OrderedBinaryTree &rhs) const;
 
-	// just traverse all the tree
-	Node* copyTree(const Node &other);
-
 private:
+	// recursive function to make the copy constructor work
+	void Copy(Node *curr);
 	// recursive function for AddElement() method
 	Node *Insert(Node *curr, const T &newKey);
+
 
 	Node *m_pHead;
 };
 
 template <typename T> OrderedBinaryTree<T>::OrderedBinaryTree(const OrderedBinaryTree &other) {
-	// if there are any nodes in current object, just delete them
-	if (m_pHead != NULL) {
-		delete m_pHead;
-		m_pHead = NULL;
-	}
-	// and create new one
-	m_pHead = new Node;
-	// check if other tree is empty
-	if (other.m_pHead != NULL) {
-		// read tree and create nodes with corresponding values
-		m_pHead->m_Key = other.m_pHead->m_Key;
-		while (readTree(other.m_pHead) == true) {
-			AddElement();
+	// call recursive function to copy nodes from other tree
+	Copy(m_pHead);
+}
+
+template <typename T> void OrederedBinaryTree<T>::Copy(Node *curr) {
+	// if there are any nodes for copy
+	if (curr != NULL) {
+		// add current key value to this tree
+		AddElement(curr->m_Key);
+		// then go to the left
+		if (curr->m_pLeft != NULL) {
+			Copy(curr->m_pLeft);
+		}
+		// and go to the right
+		if (curr->m_pRight != NULL) {
+			Copy(curr->m_pRight);
 		}
 	}
 }
@@ -63,7 +66,8 @@ template <typename T> void OrderedBinaryTree<T>::AddElement(const T &newKey) {
 	m_pHead = Insert(m_pHead, newKey);
 }
 
-template <typename T> OrderedBinaryTree<T>::Insert(Node *curr, const T &newKey) {
+template <typename T>
+typename OrderedBinaryTree<T>::Node* OrderedBinaryTree<T>::Insert(Node *curr, const T &newKey) {
 	// clear tree case
 	if (curr == NULL) {
 		Node *newLeaf = new Node;
