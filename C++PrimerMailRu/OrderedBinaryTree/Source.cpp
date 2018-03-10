@@ -7,9 +7,8 @@ protected:
 		Node(const Node &other) {
 			// just copy the key value
 			m_Key = other.m_key;
-			// and don't set pointers for now???
 		}
-		~Node() { delete m_pLeft; m_pLeft = NULL; delete m_pRight; m_pRight = NULL; }
+		~Node() { m_pLeft = NULL; m_pRight = NULL; }
 
 		T m_key;
 		Node *m_pLeft;
@@ -19,11 +18,11 @@ protected:
 public:
 	OrderedBinaryTree() : m_pHead(NULL) {}
 	OrderedBinaryTree(const OrderedBinaryTree &other);
-	~OrderedBinaryTree() { delete m_pHead; m_pHead = NULL; }
+	~OrderedBinaryTree() { m_pHead = DeleteTree(m_pHead); }
 
 	void AddElement(const T &newKey);
 	bool RemoveElement(const T &key);
-	bool FindElement(const T &key);
+	Node *FindElement(const T &key);
 	void ScreenOutput();
 
 	OrderedBinaryTree operator+(const OrderedBinaryTree &rhs) const;
@@ -33,7 +32,7 @@ public:
 
 private:
 	// recursive function to make the copy constructor work
-	void Copy(Node *curr);
+	void Copy(Node *other);
 	// recursive function for AddElement() method
 	Node *Insert(Node *curr, const T &newKey);
 	// it was part of RemoveElement() at first...
@@ -42,27 +41,53 @@ private:
 	Node *FindMax(Node *curr);
 	// recursive function to use in public RemoveElement() method
 	Node *Remove(Node *curr, const T &key);
+	// method delete all the nodes in the tree
+	Node *DeleteTree(Node *curr);
+	// output all keys from this tree
+	void ReadAllTree(Node *curr);
 
 	Node *m_pHead;
 };
 
 template <typename T> OrderedBinaryTree<T>::OrderedBinaryTree(const OrderedBinaryTree &other) {
+	// Delete current tree
+	m_pHead = DeleteTree(m_pHead);
 	// call recursive function to copy nodes from other tree
-	Copy(m_pHead);
+	Copy(other);
 }
 
-template <typename T> void OrderedBinaryTree<T>::Copy(Node *curr) {
+template <typename T>
+typename OrderedBinaryTree<T>::Node* OrderedBinaryTree<T>::DeleteTree(Node *curr) {
+	// if the tree is empty return NULL for new head
+	if (curr == NULL) {
+		return NULL;
+	}
+	// if there are some children on the left go there and delete them
+	if (curr->m_pLeft != NULL) {
+		curr = DeleteTree(curr->m_pLeft);
+	}
+	// if there are some children on the right go there and delete them
+	if (curr->m_pRight != NULL) {
+		curr = DeleteTree(curr->m_pRight);
+	}
+	// when there are not any children delete curr pointer and return NULL
+	delete curr;
+	curr = NULL;
+	return curr;
+}
+
+template <typename T> void OrderedBinaryTree<T>::Copy(Node *other) {
 	// if there are any nodes for copy
-	if (curr != NULL) {
+	if (other != NULL) {
 		// add current key value to this tree
-		AddElement(curr->m_Key);
+		AddElement(other->m_Key);
 		// then go to the left
-		if (curr->m_pLeft != NULL) {
-			Copy(curr->m_pLeft);
+		if (other->m_pLeft != NULL) {
+			Copy(other->m_pLeft);
 		}
 		// and go to the right
-		if (curr->m_pRight != NULL) {
-			Copy(curr->m_pRight);
+		if (other->m_pRight != NULL) {
+			Copy(other->m_pRight);
 		}
 	}
 }
@@ -81,14 +106,19 @@ typename OrderedBinaryTree<T>::Node* OrderedBinaryTree<T>::Insert(Node *curr, co
 	}
 	// if new key is less than current go to left side
 	if (curr->m_Key > newKey) {
-		curr->m_pLeft = AddElement(curr->m_pLeft, newKey);
+		curr->m_pLeft = Insert(curr->m_pLeft, newKey);
 	}
 	// otherwise go to the right
 	else (curr->m_Key < newKey) {
-		curr->m_pRight = AddElement(curr->m_pRight, newKey);
+		curr->m_pRight = Insert(curr->m_pRight, newKey);
 	}
 	// after receiving the base case unwind all subtree back and return first head pointer
 	return curr;
+}
+
+template <typename T>
+typename OrderedBinaryTree<T>::Node* OrderedBinaryTree<T>::FindElement(const T &key) {
+	return Find(m_pHead, key);
 }
 
 template <typename T>
@@ -137,7 +167,7 @@ typename OrderedBinaryTree<T>::Node* OrderedBinaryTree<T>::Remove(Node *curr, co
 			delete curr;
 			return temp;
 		}
-		// only right children case
+		// only left children case
 		if (curr->m_pRight == NULL) {
 			Node *temp = curr->m_pLeft;
 			delete curr;
@@ -167,11 +197,24 @@ typename OrderedBinaryTree<T>::Node* OrderedBinaryTree<T>::Remove(Node *curr, co
 
 template <typename T> bool OrderedBinaryTree<T>::RemoveElement(const T &key) {
 	// use private recursive method, that returns new tree
-	m_pHead = Remove(m_pHead, curr);
+	m_pHead = Remove(m_pHead, key);
 }
 
-template <typename T> OrderedBinaryTree<T>::readTree() {
+template <typename T>
+typename OrderedBinaryTree<T>::Node *OrderedBinaryTree<T>::ReadAllTree(Node *curr) {
+	// if there are any nodes in the tree
+	if (curr != NULL) {
+		ReadAllTree(curr->m_pLeft);
+		ReadAllTree(curr->m_pRight);
+		std::cout << curr->m_Key << ',';
+	}
+}
 
+template <typename T> void OrderedBinaryTree<T>::ScreenOutput() {
+	// output only if any node exist
+	if (m_pHead != NULL) {
+		ScreenOutput()
+	}
 }
 
 int  main() {
