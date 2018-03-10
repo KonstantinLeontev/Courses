@@ -23,7 +23,7 @@ public:
 	void AddElement(const T &newKey);
 	bool RemoveElement(const T &key);
 	Node *FindElement(const T &key);
-	void ScreenOutput();
+	void ScreenOutput(const int &choice);
 
 	OrderedBinaryTree operator+(const OrderedBinaryTree &rhs) const;
 	OrderedBinaryTree operator-(const OrderedBinaryTree &rhs) const;
@@ -45,6 +45,10 @@ private:
 	Node *DeleteTree(Node *curr);
 	// output all keys from this tree
 	void ReadAllTree(Node *curr);
+	// output only non-child leaves
+	void ReadNonChild(Node *curr);
+	// method for '-' operator overloading
+	void Subtract(Node *curr, const OrderedBinaryTree &rhs, OrderedBinaryTree &newTree) const;
 
 	Node *m_pHead;
 };
@@ -200,8 +204,7 @@ template <typename T> bool OrderedBinaryTree<T>::RemoveElement(const T &key) {
 	m_pHead = Remove(m_pHead, key);
 }
 
-template <typename T>
-typename OrderedBinaryTree<T>::Node *OrderedBinaryTree<T>::ReadAllTree(Node *curr) {
+template <typename T> void OrderedBinaryTree<T>::ReadAllTree(Node *curr) {
 	// if there are any nodes in the tree
 	if (curr != NULL) {
 		ReadAllTree(curr->m_pLeft);
@@ -210,11 +213,58 @@ typename OrderedBinaryTree<T>::Node *OrderedBinaryTree<T>::ReadAllTree(Node *cur
 	}
 }
 
-template <typename T> void OrderedBinaryTree<T>::ScreenOutput() {
-	// output only if any node exist
-	if (m_pHead != NULL) {
-		ScreenOutput()
+template <typename T> void OrderedBinaryTree<T>::ReadNonChild(Node *curr) {
+	// if there are any nodes in the tree
+	if (curr != NULL) {
+		ReadNonChild(curr->m_pLeft);
+		ReadNoneChild(curr->m_pRight);
+		if (curr->m_pLeft == NULL && curr->m_pRight == NULL) {
+			std::cout << curr->m_Key << ',';
+		}
 	}
+}
+
+template <typename T> void OrderedBinaryTree<T>::ScreenOutput(const int &choice) {
+	// output all nodes
+	if (choice == 1) {
+		ReadAllTree(m_pHead);
+	}
+	// output non-child nodes
+	else if (choice == 2) {
+		ReadNoneChild(m_pHead);
+	}
+}
+
+template <typename T> OrderedBinaryTree<T> OrderedBinaryTree<T>::operator+(const OrderedBinaryTree &rhs) const {
+	// new tree for result of addition
+	OrderedBinaryTree result;
+	// uses private method to recursive copy values from rhs to this tree
+	result.Copy(rhs->m_pHead);
+	// copy lhs values
+	result.Copy(m_pHead);
+	// return copy of the result tree becouse of ending result lifetime
+	return result;
+}
+
+template <typename T> void OrderedBinaryTree<T>::Subtract(Node *curr, const OrderedBinaryTree &rhs, OrderedBinaryTree &newTree) const {
+	if (curr != NULL) {
+		Subtract(curr->m_pLeft, rhs, newTree);
+		Subtract(curr->m_pRight, rhs, newTree);
+		// if cannot find the same key value on the right
+		if (rhs.FindElement(curr->m_Key) == NULL) {
+			// add that key to the new tree
+			newTree.AddElement(curr->m_Key);
+		}
+	}
+}
+
+template <typename T> OrderedBinaryTree<T> OrderedBinaryTree<T>::operator-(const OrderedBinaryTree &rhs) const {
+	// create new tree for result
+	OrderedBinaryTree result;
+	// traverse this tree and check every node for same value in the rhs tree
+	Subtract(m_pHead, rhs, result);
+	// return copy of new tree
+	return result;
 }
 
 int  main() {
