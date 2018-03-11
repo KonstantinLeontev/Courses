@@ -283,8 +283,11 @@ template <typename T> OrderedBinaryTree<T> &OrderedBinaryTree<T>::operator=(cons
 
 template <typename T> std::ostream& OrderedBinaryTree<T>::ReadAllToStream(std::ostream &os, Node *curr) const {
 	if (curr != NULL) {
+		// read current key to stream
 		os << curr->m_Key << ',';
+		// go to the left
 		os << ReadAllToStream(os, curr->m_pLeft);
+		// go to the right
 		os << ReadAllToStream(os, curr->m_pRight);
 	}
 	return os;
@@ -295,5 +298,16 @@ template <typename T> std::ostream& operator<<(std::ostream &os, const OrderedBi
 }
 
 int  main() {
-
+	// create new tree
+	OrderedBinaryTree<int> tree;
+	int n;
+	// read all int values from buffer to n
+	while (std::cin >> n) {
+		// and add to the tree
+		tree.AddElement(n);
+	}
+	// output all keys to the screen
+	tree.ScreenOutput(1);
+	std::cout << '\n';
+	tree.ScreenOutput(2);
 }
