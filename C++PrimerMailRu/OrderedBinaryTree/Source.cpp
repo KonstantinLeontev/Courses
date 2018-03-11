@@ -27,8 +27,8 @@ public:
 
 	OrderedBinaryTree operator+(const OrderedBinaryTree &rhs) const;
 	OrderedBinaryTree operator-(const OrderedBinaryTree &rhs) const;
-	operator=(const OrderedBinaryTree &rhs);
-	operator<<(const OrderedBinaryTree &rhs) const;
+	OrderedBinaryTree &operator=(const OrderedBinaryTree &rhs);
+	friend sdt::ostream& operator<<(std::ostream &os, OrderedBinaryTree &rhs);
 
 private:
 	// recursive function to make the copy constructor work
@@ -49,6 +49,8 @@ private:
 	void ReadNonChild(Node *curr);
 	// method for '-' operator overloading
 	void Subtract(Node *curr, const OrderedBinaryTree &rhs, OrderedBinaryTree &newTree) const;
+	// method for '<<' operator overloading
+	std::ostream& ReadAllToStream(std::ostream &os, Node *curr) const;
 
 	Node *m_pHead;
 };
@@ -265,6 +267,31 @@ template <typename T> OrderedBinaryTree<T> OrderedBinaryTree<T>::operator-(const
 	Subtract(m_pHead, rhs, result);
 	// return copy of new tree
 	return result;
+}
+
+template <typename T> OrderedBinaryTree<T> &OrderedBinaryTree<T>::operator=(const OrderedBinaryTree &rhs) {
+	// check for self-assignment
+	if (this == rhs) {
+		return this;
+	}
+	// completely delete old tree
+	m_pHead = DeleteTree(m_pHead);
+	// copy rhs tree to the left
+	Copy(rhs->m_pHead);
+	return this;
+}
+
+template <typename T> std::ostream& OrderedBinaryTree<T>::ReadAllToStream(std::ostream &os, Node *curr) const {
+	if (curr != NULL) {
+		os << curr->m_Key << ',';
+		os << ReadAllToStream(os, curr->m_pLeft);
+		os << ReadAllToStream(os, curr->m_pRight);
+	}
+	return os;
+}
+
+template <typename T> std::ostream& operator<<(std::ostream &os, const OrderedBinaryTree<T> &rhs) {
+	return ReadAllToStream(os, rhs->m_pHead);
 }
 
 int  main() {
