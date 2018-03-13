@@ -6,11 +6,11 @@ protected:
 		Node() : m_pLeft(NULL), m_pRight(NULL) {}
 		Node(const Node &other) {
 			// just copy the key value
-			m_Key = other.m_key;
+			m_Key = other.m_Key;
 		}
 		~Node() { m_pLeft = NULL; m_pRight = NULL; }
 
-		T m_key;
+		T m_Key;
 		Node *m_pLeft;
 		Node *m_pRight;
 	};
@@ -28,7 +28,7 @@ public:
 	OrderedBinaryTree operator+(const OrderedBinaryTree &rhs) const;
 	OrderedBinaryTree operator-(const OrderedBinaryTree &rhs) const;
 	OrderedBinaryTree &operator=(const OrderedBinaryTree &rhs);
-	friend sdt::ostream& operator<<(std::ostream &os, OrderedBinaryTree &rhs);
+	friend std::ostream &operator<<(std::ostream &os, OrderedBinaryTree &rhs);
 
 private:
 	// recursive function to make the copy constructor work
@@ -46,7 +46,7 @@ private:
 	// output all keys from this tree
 	void ReadAllTree(Node *curr);
 	// output only non-child leaves
-	void ReadNonChild(Node *curr);
+	void ReadNoChild(Node *curr);
 	// method for '-' operator overloading
 	void Subtract(Node *curr, const OrderedBinaryTree &rhs, OrderedBinaryTree &newTree) const;
 	// method for '<<' operator overloading
@@ -115,7 +115,7 @@ typename OrderedBinaryTree<T>::Node* OrderedBinaryTree<T>::Insert(Node *curr, co
 		curr->m_pLeft = Insert(curr->m_pLeft, newKey);
 	}
 	// otherwise go to the right
-	else (curr->m_Key < newKey) {
+	if (curr->m_Key < newKey) {
 		curr->m_pRight = Insert(curr->m_pRight, newKey);
 	}
 	// after receiving the base case unwind all subtree back and return first head pointer
@@ -215,11 +215,11 @@ template <typename T> void OrderedBinaryTree<T>::ReadAllTree(Node *curr) {
 	}
 }
 
-template <typename T> void OrderedBinaryTree<T>::ReadNonChild(Node *curr) {
+template <typename T> void OrderedBinaryTree<T>::ReadNoChild(Node *curr) {
 	// if there are any nodes in the tree
 	if (curr != NULL) {
-		ReadNonChild(curr->m_pLeft);
-		ReadNoneChild(curr->m_pRight);
+		ReadNoChild(curr->m_pLeft);
+		ReadNoChild(curr->m_pRight);
 		if (curr->m_pLeft == NULL && curr->m_pRight == NULL) {
 			std::cout << curr->m_Key << ',';
 		}
@@ -233,7 +233,7 @@ template <typename T> void OrderedBinaryTree<T>::ScreenOutput(const int &choice)
 	}
 	// output non-child nodes
 	else if (choice == 2) {
-		ReadNoneChild(m_pHead);
+		ReadNoChild(m_pHead);
 	}
 }
 
@@ -301,8 +301,14 @@ int  main() {
 	// create new tree
 	OrderedBinaryTree<int> tree;
 	int n;
-	// read all int values from buffer to n
-	while (std::cin >> n) {
+	char comma;
+	// read first value
+	std::cin >> n;
+	// and add it to the tree
+	tree.AddElement(n);
+	// read all comma separated int values from buffer
+	while (std::cin.peek() == ',') {
+		std::cin >> comma >> n;
 		// and add to the tree
 		tree.AddElement(n);
 	}
