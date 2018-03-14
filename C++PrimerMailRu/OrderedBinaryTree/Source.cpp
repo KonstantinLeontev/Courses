@@ -28,7 +28,7 @@ public:
 	OrderedBinaryTree operator+(const OrderedBinaryTree &rhs) const;
 	OrderedBinaryTree operator-(const OrderedBinaryTree &rhs) const;
 	OrderedBinaryTree &operator=(const OrderedBinaryTree &rhs);
-	friend std::ostream &operator<<(std::ostream &os, OrderedBinaryTree &rhs);
+	template <typename U> friend  std::ostream& operator<< (std::ostream &os, OrderedBinaryTree<U> &rhs);
 
 private:
 	// recursive function to make the copy constructor work
@@ -241,7 +241,7 @@ template <typename T> OrderedBinaryTree<T> OrderedBinaryTree<T>::operator+(const
 	// new tree for result of addition
 	OrderedBinaryTree result;
 	// uses private method to recursive copy values from rhs to this tree
-	result.Copy(rhs->m_pHead);
+	result.Copy(rhs.m_pHead);
 	// copy lhs values
 	result.Copy(m_pHead);
 	// return copy of the result tree becouse of ending result lifetime
@@ -277,7 +277,7 @@ template <typename T> OrderedBinaryTree<T> &OrderedBinaryTree<T>::operator=(cons
 	// completely delete old tree
 	m_pHead = DeleteTree(m_pHead);
 	// copy rhs tree to the left
-	Copy(rhs->m_pHead);
+	Copy(rhs.m_pHead);
 	return this;
 }
 
@@ -293,8 +293,8 @@ template <typename T> std::ostream& OrderedBinaryTree<T>::ReadAllToStream(std::o
 	return os;
 }
 
-template <typename T> std::ostream& operator<<(std::ostream &os, const OrderedBinaryTree<T> &rhs) {
-	return ReadAllToStream(os, rhs->m_pHead);
+template <typename U> std::ostream& operator<<(std::ostream &os, const OrderedBinaryTree<U> &rhs) {
+	return rhs.ReadAllToStream(os, rhs.m_pHead);
 }
 
 int  main() {
@@ -312,8 +312,6 @@ int  main() {
 		// and add to the tree
 		tree.AddElement(n);
 	}
-	// output all keys to the screen
-	tree.ScreenOutput(1);
-	std::cout << '\n';
+	// output keys to the screen
 	tree.ScreenOutput(2);
 }
