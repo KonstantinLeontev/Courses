@@ -300,18 +300,14 @@ template <typename U> std::ostream& operator<<(std::ostream &os, const OrderedBi
 int  main() {
 	// create new tree
 	OrderedBinaryTree<int> tree;
-	//int n;
-	//char comma;
-	//// read first value
-	//std::cin >> n;
-	//// and add it to the tree
-	//tree.AddElement(n);
-	//// read all comma separated int values from buffer
-	////while (std::cin.peek() == ',') {
-	////	std::cin >> comma >> n;
-	////	// and add to the tree
-	////	tree.AddElement(n);
-	////}
-	//// output keys to the screen
-	//tree.ScreenOutput(2);
+	int n;
+	scanf_s("%d", &n);
+	// and add it to the tree
+	tree.AddElement(n);
+	// read all comma separated int values from buffer
+	while (scanf_s(",%d", &n)) {
+		tree.AddElement(n);
+	}
+	// output keys to the screen
+	tree.ScreenOutput(2);
 }
