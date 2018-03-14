@@ -21,7 +21,7 @@ public:
 	~OrderedBinaryTree() { m_pHead = DeleteTree(m_pHead); }
 
 	void AddElement(const T &newKey);
-	bool RemoveElement(const T &key);
+	void RemoveElement(const T &key);
 	Node *FindElement(const T &key);
 	void ScreenOutput(const int &choice);
 
@@ -201,7 +201,7 @@ typename OrderedBinaryTree<T>::Node* OrderedBinaryTree<T>::Remove(Node *curr, co
 	return curr;
 }
 
-template <typename T> bool OrderedBinaryTree<T>::RemoveElement(const T &key) {
+template <typename T> void OrderedBinaryTree<T>::RemoveElement(const T &key) {
 	// use private recursive method, that returns new tree
 	m_pHead = Remove(m_pHead, key);
 }
@@ -300,18 +300,18 @@ template <typename U> std::ostream& operator<<(std::ostream &os, const OrderedBi
 int  main() {
 	// create new tree
 	OrderedBinaryTree<int> tree;
-	int n;
-	char comma;
-	// read first value
-	std::cin >> n;
-	// and add it to the tree
-	tree.AddElement(n);
-	// read all comma separated int values from buffer
-	while (std::cin.peek() == ',') {
-		std::cin >> comma >> n;
-		// and add to the tree
-		tree.AddElement(n);
-	}
-	// output keys to the screen
-	tree.ScreenOutput(2);
+	//int n;
+	//char comma;
+	//// read first value
+	//std::cin >> n;
+	//// and add it to the tree
+	//tree.AddElement(n);
+	//// read all comma separated int values from buffer
+	////while (std::cin.peek() == ',') {
+	////	std::cin >> comma >> n;
+	////	// and add to the tree
+	////	tree.AddElement(n);
+	////}
+	//// output keys to the screen
+	//tree.ScreenOutput(2);
 }
