@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 
 template<typename T> class OrderedBinaryTree {
 protected:
@@ -301,13 +302,18 @@ int  main() {
 	// create new tree
 	OrderedBinaryTree<int> tree;
 	int n;
-	scanf_s("%d", &n);
-	// and add it to the tree
-	tree.AddElement(n);
-	// read all comma separated int values from buffer
-	while (scanf_s(",%d", &n)) {
+	std::string input, temp;
+	// get all input from cin
+	std::getline(std::cin, input);
+	// put input into ss stream
+	std::istringstream ss(input);
+	// read from istringstream with ',' as delimiter
+	while (std::getline(ss, temp, ',')) {
+		// convert temp string into the int value
+		n = std::stoi(temp);
+		// and add it to the tree
 		tree.AddElement(n);
 	}
-	// output keys to the screen
+	// put non-child leaves to the screen
 	tree.ScreenOutput(2);
 }
