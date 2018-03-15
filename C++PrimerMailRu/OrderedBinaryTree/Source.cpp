@@ -1,5 +1,4 @@
 #include <iostream>
-#include <sstream>
 
 template<typename T> class OrderedBinaryTree {
 protected:
@@ -19,7 +18,7 @@ protected:
 public:
 	OrderedBinaryTree() : m_pHead(NULL) {}
 	OrderedBinaryTree(const OrderedBinaryTree &other);
-	~OrderedBinaryTree() { m_pHead = DeleteTree(m_pHead); }
+	~OrderedBinaryTree() { DeleteTree(m_pHead); }
 
 	void AddElement(const T &newKey);
 	void RemoveElement(const T &key);
@@ -43,7 +42,7 @@ private:
 	// recursive function to use in public RemoveElement() method
 	Node *Remove(Node *curr, const T &key);
 	// method delete all the nodes in the tree
-	Node *DeleteTree(Node *curr);
+	void DeleteTree(Node *curr);
 	// output all keys from this tree
 	void ReadAllTree(Node *curr);
 	// output only non-child leaves
@@ -58,29 +57,18 @@ private:
 
 template <typename T> OrderedBinaryTree<T>::OrderedBinaryTree(const OrderedBinaryTree &other) {
 	// Delete current tree
-	m_pHead = DeleteTree(m_pHead);
+	DeleteTree(m_pHead);
 	// call recursive function to copy nodes from other tree
 	Copy(other);
 }
 
 template <typename T>
-typename OrderedBinaryTree<T>::Node* OrderedBinaryTree<T>::DeleteTree(Node *curr) {
-	// if the tree is empty return NULL for new head
-	if (curr == NULL) {
-		return NULL;
+void OrderedBinaryTree<T>::DeleteTree(Node *curr) {
+	if (curr != NULL) {
+		DeleteTree(curr->m_pLeft);
+		DeleteTree(curr->m_pRight);
+		delete curr;
 	}
-	// if there are some children on the left go there and delete them
-	if (curr->m_pLeft != NULL) {
-		curr = DeleteTree(curr->m_pLeft);
-	}
-	// if there are some children on the right go there and delete them
-	if (curr->m_pRight != NULL) {
-		curr = DeleteTree(curr->m_pRight);
-	}
-	// when there are not any children delete curr pointer and return NULL
-	delete curr;
-	curr = NULL;
-	return curr;
 }
 
 template <typename T> void OrderedBinaryTree<T>::Copy(Node *other) {
@@ -276,7 +264,7 @@ template <typename T> OrderedBinaryTree<T> &OrderedBinaryTree<T>::operator=(cons
 		return this;
 	}
 	// completely delete old tree
-	m_pHead = DeleteTree(m_pHead);
+	DeleteTree(m_pHead);
 	// copy rhs tree to the left
 	Copy(rhs.m_pHead);
 	return this;
@@ -302,16 +290,15 @@ int  main() {
 	// create new tree
 	OrderedBinaryTree<int> tree;
 	int n;
-	std::string input, temp;
-	// get all input from cin
-	std::getline(std::cin, input);
-	// put input into ss stream
-	std::istringstream ss(input);
-	// read from istringstream with ',' as delimiter
-	while (std::getline(ss, temp, ',')) {
-		// convert temp string into the int value
-		n = std::stoi(temp);
-		// and add it to the tree
+	char comma;
+	// read first value
+	std::cin >> n;
+	// and add it to the tree
+	tree.AddElement(n);
+	// read all comma separated int values from buffer
+	while (std::cin.peek() == ',') {
+		std::cin >> comma >> n;
+		// and add to the tree
 		tree.AddElement(n);
 	}
 	// put non-child leaves to the screen
