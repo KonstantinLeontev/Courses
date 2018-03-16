@@ -1,4 +1,6 @@
 #include <iostream>
+#include <string>
+#include <sstream>
 
 template<typename T> class OrderedBinaryTree {
 protected:
@@ -22,13 +24,13 @@ public:
 
 	void AddElement(const T &newKey);
 	void RemoveElement(const T &key);
-	Node *FindElement(const T &key);
+	Node *FindElement(const T &key) const;
 	void ScreenOutput(const int &choice);
 
 	OrderedBinaryTree operator+(const OrderedBinaryTree &rhs) const;
 	OrderedBinaryTree operator-(const OrderedBinaryTree &rhs) const;
 	OrderedBinaryTree &operator=(const OrderedBinaryTree &rhs);
-	template <typename U> friend  std::ostream& operator<< (std::ostream &os, OrderedBinaryTree<U> &rhs);
+	template <typename U> friend std::ostream& operator<<(std::ostream &os, const OrderedBinaryTree<U> &rhs);
 
 private:
 	// recursive function to make the copy constructor work
@@ -36,9 +38,9 @@ private:
 	// recursive function for AddElement() method
 	Node *Insert(Node *curr, const T &newKey);
 	// it was part of RemoveElement() at first...
-	Node *Find(Node *curr, const T &key);
+	Node *Find(Node *curr, const T &key) const;
 	// this method is a part of next Remove()
-	Node *FindMax(Node *curr);
+	Node *FindMax(Node *curr) const;
 	// recursive function to use in public RemoveElement() method
 	Node *Remove(Node *curr, const T &key);
 	// method delete all the nodes in the tree
@@ -46,11 +48,13 @@ private:
 	// output all keys from this tree
 	void ReadAllTree(Node *curr);
 	// output only non-child leaves
-	void ReadNoChild(Node *curr);
+	void ReadNoChild(Node *curr, T firstNonChild);
+	// help method for output non-child leaves without comma at the end
+	Node *getFirstNonChild(Node *curr);
 	// method for '-' operator overloading
 	void Subtract(Node *curr, const OrderedBinaryTree &rhs, OrderedBinaryTree &newTree) const;
 	// method for '<<' operator overloading
-	std::ostream& ReadAllToStream(std::ostream &os, Node *curr) const;
+	void ReadAllToStream(std::ostream &os, Node *curr) const;
 
 	Node *m_pHead;
 };
@@ -59,7 +63,7 @@ template <typename T> OrderedBinaryTree<T>::OrderedBinaryTree(const OrderedBinar
 	// Delete current tree
 	DeleteTree(m_pHead);
 	// call recursive function to copy nodes from other tree
-	Copy(other);
+	Copy(other.m_pHead);
 }
 
 template <typename T>
@@ -112,12 +116,12 @@ typename OrderedBinaryTree<T>::Node* OrderedBinaryTree<T>::Insert(Node *curr, co
 }
 
 template <typename T>
-typename OrderedBinaryTree<T>::Node* OrderedBinaryTree<T>::FindElement(const T &key) {
+typename OrderedBinaryTree<T>::Node* OrderedBinaryTree<T>::FindElement(const T &key) const{
 	return Find(m_pHead, key);
 }
 
 template <typename T>
-typename OrderedBinaryTree<T>::Node* OrderedBinaryTree<T>::Find(Node *curr, const T &key) {
+typename OrderedBinaryTree<T>::Node* OrderedBinaryTree<T>::Find(Node *curr, const T &key) const{
 	// base case for empty tree
 	if (curr == NULL) {
 		return NULL;
@@ -128,16 +132,16 @@ typename OrderedBinaryTree<T>::Node* OrderedBinaryTree<T>::Find(Node *curr, cons
 	}
 	// otherwise go to the left
 	else if (curr->m_Key > key) {
-		curr = Find(curr->m_pLeft, key);
+		return Find(curr->m_pLeft, key);
 	}
 	// or go to the left side
 	else {
-		curr = Find(curr->m_pRight, key);
+		return Find(curr->m_pRight, key);
 	}
 }
 
 template <typename T>
-typename OrderedBinaryTree<T>::Node* OrderedBinaryTree<T>::FindMax(Node *curr) {
+typename OrderedBinaryTree<T>::Node* OrderedBinaryTree<T>::FindMax(Node *curr) const{
 	if (curr == NULL) {
 		return NULL;
 	}
@@ -204,25 +208,45 @@ template <typename T> void OrderedBinaryTree<T>::ReadAllTree(Node *curr) {
 	}
 }
 
-template <typename T> void OrderedBinaryTree<T>::ReadNoChild(Node *curr) {
+template <typename T>
+typename OrderedBinaryTree<T>::Node* OrderedBinaryTree<T>::getFirstNonChild(Node *curr) {
+	if (curr == NULL) {
+		return NULL;
+	}
+	if (curr->m_pLeft == NULL && curr->m_pRight == NULL) {
+		return curr;
+	}
+	return getFirstNonChild(curr->m_pLeft);
+	return getFirstNonChild(curr->m_pRight);
+}
+
+template <typename T> void OrderedBinaryTree<T>::ReadNoChild(Node *curr, T firstNonChild) {
 	// if there are any nodes in the tree
 	if (curr != NULL) {
-		ReadNoChild(curr->m_pLeft);
-		ReadNoChild(curr->m_pRight);
+		// read from left and right
+		ReadNoChild(curr->m_pLeft, firstNonChild);
+		ReadNoChild(curr->m_pRight, firstNonChild);
+		// and output only non-child leaves
 		if (curr->m_pLeft == NULL && curr->m_pRight == NULL) {
-			std::cout << curr->m_Key << ',';
+			// add comma separator after all leaves exept first one
+			if (curr->m_Key != firstNonChild) {
+				std::cout << ',';
+			}
+			std::cout << curr->m_Key;
 		}
 	}
 }
 
 template <typename T> void OrderedBinaryTree<T>::ScreenOutput(const int &choice) {
-	// output all nodes
-	if (choice == 1) {
+	// output all nodes if there are any
+	if (choice == 1 && m_pHead != NULL) {
 		ReadAllTree(m_pHead);
 	}
 	// output non-child nodes
-	else if (choice == 2) {
-		ReadNoChild(m_pHead);
+	else if (choice == 2 && m_pHead != NULL) {
+		Node *p_firstNonChild = getFirstNonChild(m_pHead);
+		T firstNonChild = p_firstNonChild->m_Key;
+		ReadNoChild(m_pHead, firstNonChild);
 	}
 }
 
@@ -270,37 +294,54 @@ template <typename T> OrderedBinaryTree<T> &OrderedBinaryTree<T>::operator=(cons
 	return this;
 }
 
-template <typename T> std::ostream& OrderedBinaryTree<T>::ReadAllToStream(std::ostream &os, Node *curr) const {
+template <typename T> void OrderedBinaryTree<T>::ReadAllToStream(std::ostream &os, Node *curr) const {
 	if (curr != NULL) {
 		// read current key to stream
 		os << curr->m_Key << ',';
 		// go to the left
-		os << ReadAllToStream(os, curr->m_pLeft);
+		ReadAllToStream(os, curr->m_pLeft);
 		// go to the right
-		os << ReadAllToStream(os, curr->m_pRight);
+		ReadAllToStream(os, curr->m_pRight);
 	}
+}
+
+template <typename U> std::ostream& operator<< (std::ostream &os, const OrderedBinaryTree<U> &rhs) {
+	rhs.ReadAllToStream(os, rhs.m_pHead);
 	return os;
 }
 
-template <typename U> std::ostream& operator<<(std::ostream &os, const OrderedBinaryTree<U> &rhs) {
-	return rhs.ReadAllToStream(os, rhs.m_pHead);
+// checks if input string isn't empty
+bool checkInput(std::string &input) {
+	return !input.empty();
 }
 
 int  main() {
 	// create new tree
 	OrderedBinaryTree<int> tree;
 	int n;
-	char comma;
-	// read first value
-	std::cin >> n;
-	// and add it to the tree
-	tree.AddElement(n);
-	// read all comma separated int values from buffer
-	while (std::cin.peek() == ',') {
-		std::cin >> comma >> n;
-		// and add to the tree
-		tree.AddElement(n);
+	std::string input, temp;
+	// get all input from cin
+	std::getline(std::cin, input);
+	// put input into ss stream
+	std::istringstream ss(input);
+	// read from istringstream with ',' as delimiter
+	while (std::getline(ss, temp, ',')) {
+		// check if input isn't empty
+		if (checkInput(temp)) {
+			// convert temp string into the int value
+			n = std::stoi(temp);
+			// and add it to the tree
+			tree.AddElement(n);
+		}
 	}
 	// put non-child leaves to the screen
 	tree.ScreenOutput(2);
+
+	std::cout << tree << '\n';
+	OrderedBinaryTree<int> tree2 = tree;
+	std::cout << tree2 << '\n';
+	OrderedBinaryTree<int> tree3 = tree + tree2;
+	std::cout << tree3 << '\n';
+	OrderedBinaryTree<int> tree4 = tree3 - tree2;
+	std::cout << tree4;
 }
