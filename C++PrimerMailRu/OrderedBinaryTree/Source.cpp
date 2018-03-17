@@ -116,12 +116,12 @@ typename Tree<T>::Node* Tree<T>::Insert(Node *curr, const T &newKey) {
 }
 
 template <typename T>
-typename Tree<T>::Node* Tree<T>::FindElement(const T &key) const{
+typename Tree<T>::Node* Tree<T>::FindElement(const T &key) const {
 	return Find(m_pHead, key);
 }
 
 template <typename T>
-typename Tree<T>::Node* Tree<T>::Find(Node *curr, const T &key) const{
+typename Tree<T>::Node* Tree<T>::Find(Node *curr, const T &key) const {
 	// base case for empty tree
 	if (curr == NULL) {
 		return NULL;
@@ -141,7 +141,7 @@ typename Tree<T>::Node* Tree<T>::Find(Node *curr, const T &key) const{
 }
 
 template <typename T>
-typename Tree<T>::Node* Tree<T>::FindMax(Node *curr) const{
+typename Tree<T>::Node* Tree<T>::FindMax(Node *curr) const {
 	if (curr == NULL) {
 		return NULL;
 	}
@@ -216,8 +216,12 @@ typename Tree<T>::Node* Tree<T>::getFirstNonChild(Node *curr) {
 	if (curr->m_pLeft == NULL && curr->m_pRight == NULL) {
 		return curr;
 	}
-	return getFirstNonChild(curr->m_pLeft);
-	return getFirstNonChild(curr->m_pRight);
+	else if (curr->m_pLeft != NULL){
+		return getFirstNonChild(curr->m_pLeft);
+	}
+	else {
+		return getFirstNonChild(curr->m_pRight);
+	}
 }
 
 template <typename T> void Tree<T>::ReadNoChild(Node *curr, T firstNonChild) {
@@ -312,7 +316,16 @@ template <typename U> std::ostream& operator<< (std::ostream &os, const Tree<U> 
 
 // checks if input string isn't empty
 bool checkInput(std::string &input) {
-	return !input.empty();
+	if (!input.empty()) {
+		// check all characters in the input string
+		for (int i = 0; i < input.size(); i++) {
+			if (!isdigit(input[i]) && input[i] != '.' && input[i] != ' ') {
+				return false;
+			}
+		}
+		return true;
+	}
+	return false;
 }
 
 int  main() {
@@ -328,7 +341,7 @@ int  main() {
 	while (std::getline(ss, temp, ',')) {
 		// check if input isn't empty
 		if (checkInput(temp)) {
-			// convert temp string into the int value
+			// convert temp string into the double value
 			n = std::stod(temp);
 			// and add it to the tree
 			tree.AddElement(n);
@@ -336,12 +349,4 @@ int  main() {
 	}
 	// put non-child leaves to the screen
 	tree.ScreenOutput(2);
-
-	std::cout << tree << '\n';
-	Tree<double> tree2 = tree;
-	std::cout << tree2 << '\n';
-	Tree<double> tree3 = tree + tree2;
-	std::cout << tree3 << '\n';
-	Tree<double> tree4 = tree3 - tree2;
-	std::cout << tree4;
 }
