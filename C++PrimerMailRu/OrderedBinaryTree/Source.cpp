@@ -2,7 +2,7 @@
 #include <string>
 #include <sstream>
 
-template<typename T> class OrderedBinaryTree {
+template<typename T> class Tree {
 protected:
 	struct Node {
 		Node() : m_pLeft(NULL), m_pRight(NULL) {}
@@ -18,19 +18,19 @@ protected:
 	};
 
 public:
-	OrderedBinaryTree() : m_pHead(NULL) {}
-	OrderedBinaryTree(const OrderedBinaryTree &other);
-	~OrderedBinaryTree() { DeleteTree(m_pHead); }
+	Tree() : m_pHead(NULL) {}
+	Tree(const Tree &other);
+	~Tree() { DeleteTree(m_pHead); }
 
 	void AddElement(const T &newKey);
 	void RemoveElement(const T &key);
 	Node *FindElement(const T &key) const;
 	void ScreenOutput(const int &choice);
 
-	OrderedBinaryTree operator+(const OrderedBinaryTree &rhs) const;
-	OrderedBinaryTree operator-(const OrderedBinaryTree &rhs) const;
-	OrderedBinaryTree &operator=(const OrderedBinaryTree &rhs);
-	template <typename U> friend std::ostream& operator<<(std::ostream &os, const OrderedBinaryTree<U> &rhs);
+	Tree operator+(const Tree &rhs) const;
+	Tree operator-(const Tree &rhs) const;
+	Tree &operator=(const Tree &rhs);
+	template <typename U> friend std::ostream& operator<<(std::ostream &os, const Tree<U> &rhs);
 
 private:
 	// recursive function to make the copy constructor work
@@ -52,14 +52,14 @@ private:
 	// help method for output non-child leaves without comma at the end
 	Node *getFirstNonChild(Node *curr);
 	// method for '-' operator overloading
-	void Subtract(Node *curr, const OrderedBinaryTree &rhs, OrderedBinaryTree &newTree) const;
+	void Subtract(Node *curr, const Tree &rhs, Tree &newTree) const;
 	// method for '<<' operator overloading
 	void ReadAllToStream(std::ostream &os, Node *curr) const;
 
 	Node *m_pHead;
 };
 
-template <typename T> OrderedBinaryTree<T>::OrderedBinaryTree(const OrderedBinaryTree &other) {
+template <typename T> Tree<T>::Tree(const Tree &other) {
 	// Delete current tree
 	DeleteTree(m_pHead);
 	// call recursive function to copy nodes from other tree
@@ -67,7 +67,7 @@ template <typename T> OrderedBinaryTree<T>::OrderedBinaryTree(const OrderedBinar
 }
 
 template <typename T>
-void OrderedBinaryTree<T>::DeleteTree(Node *curr) {
+void Tree<T>::DeleteTree(Node *curr) {
 	if (curr != NULL) {
 		DeleteTree(curr->m_pLeft);
 		DeleteTree(curr->m_pRight);
@@ -75,7 +75,7 @@ void OrderedBinaryTree<T>::DeleteTree(Node *curr) {
 	}
 }
 
-template <typename T> void OrderedBinaryTree<T>::Copy(Node *other) {
+template <typename T> void Tree<T>::Copy(Node *other) {
 	// if there are any nodes for copy
 	if (other != NULL) {
 		// add current key value to this tree
@@ -91,12 +91,12 @@ template <typename T> void OrderedBinaryTree<T>::Copy(Node *other) {
 	}
 }
 
-template <typename T> void OrderedBinaryTree<T>::AddElement(const T &newKey) {
+template <typename T> void Tree<T>::AddElement(const T &newKey) {
 	m_pHead = Insert(m_pHead, newKey);
 }
 
 template <typename T>
-typename OrderedBinaryTree<T>::Node* OrderedBinaryTree<T>::Insert(Node *curr, const T &newKey) {
+typename Tree<T>::Node* Tree<T>::Insert(Node *curr, const T &newKey) {
 	// clear tree case
 	if (curr == NULL) {
 		Node *newLeaf = new Node;
@@ -116,12 +116,12 @@ typename OrderedBinaryTree<T>::Node* OrderedBinaryTree<T>::Insert(Node *curr, co
 }
 
 template <typename T>
-typename OrderedBinaryTree<T>::Node* OrderedBinaryTree<T>::FindElement(const T &key) const{
+typename Tree<T>::Node* Tree<T>::FindElement(const T &key) const{
 	return Find(m_pHead, key);
 }
 
 template <typename T>
-typename OrderedBinaryTree<T>::Node* OrderedBinaryTree<T>::Find(Node *curr, const T &key) const{
+typename Tree<T>::Node* Tree<T>::Find(Node *curr, const T &key) const{
 	// base case for empty tree
 	if (curr == NULL) {
 		return NULL;
@@ -141,7 +141,7 @@ typename OrderedBinaryTree<T>::Node* OrderedBinaryTree<T>::Find(Node *curr, cons
 }
 
 template <typename T>
-typename OrderedBinaryTree<T>::Node* OrderedBinaryTree<T>::FindMax(Node *curr) const{
+typename Tree<T>::Node* Tree<T>::FindMax(Node *curr) const{
 	if (curr == NULL) {
 		return NULL;
 	}
@@ -153,7 +153,7 @@ typename OrderedBinaryTree<T>::Node* OrderedBinaryTree<T>::FindMax(Node *curr) c
 }
 
 template <typename T>
-typename OrderedBinaryTree<T>::Node* OrderedBinaryTree<T>::Remove(Node *curr, const T &key) {
+typename Tree<T>::Node* Tree<T>::Remove(Node *curr, const T &key) {
 	// base case for empty tree
 	if (curr == NULL) {
 		return NULL;
@@ -194,12 +194,12 @@ typename OrderedBinaryTree<T>::Node* OrderedBinaryTree<T>::Remove(Node *curr, co
 	return curr;
 }
 
-template <typename T> void OrderedBinaryTree<T>::RemoveElement(const T &key) {
+template <typename T> void Tree<T>::RemoveElement(const T &key) {
 	// use private recursive method, that returns new tree
 	m_pHead = Remove(m_pHead, key);
 }
 
-template <typename T> void OrderedBinaryTree<T>::ReadAllTree(Node *curr) {
+template <typename T> void Tree<T>::ReadAllTree(Node *curr) {
 	// if there are any nodes in the tree
 	if (curr != NULL) {
 		ReadAllTree(curr->m_pLeft);
@@ -209,7 +209,7 @@ template <typename T> void OrderedBinaryTree<T>::ReadAllTree(Node *curr) {
 }
 
 template <typename T>
-typename OrderedBinaryTree<T>::Node* OrderedBinaryTree<T>::getFirstNonChild(Node *curr) {
+typename Tree<T>::Node* Tree<T>::getFirstNonChild(Node *curr) {
 	if (curr == NULL) {
 		return NULL;
 	}
@@ -220,7 +220,7 @@ typename OrderedBinaryTree<T>::Node* OrderedBinaryTree<T>::getFirstNonChild(Node
 	return getFirstNonChild(curr->m_pRight);
 }
 
-template <typename T> void OrderedBinaryTree<T>::ReadNoChild(Node *curr, T firstNonChild) {
+template <typename T> void Tree<T>::ReadNoChild(Node *curr, T firstNonChild) {
 	// if there are any nodes in the tree
 	if (curr != NULL) {
 		// read from left and right
@@ -237,7 +237,7 @@ template <typename T> void OrderedBinaryTree<T>::ReadNoChild(Node *curr, T first
 	}
 }
 
-template <typename T> void OrderedBinaryTree<T>::ScreenOutput(const int &choice) {
+template <typename T> void Tree<T>::ScreenOutput(const int &choice) {
 	// output all nodes if there are any
 	if (choice == 1 && m_pHead != NULL) {
 		ReadAllTree(m_pHead);
@@ -250,9 +250,9 @@ template <typename T> void OrderedBinaryTree<T>::ScreenOutput(const int &choice)
 	}
 }
 
-template <typename T> OrderedBinaryTree<T> OrderedBinaryTree<T>::operator+(const OrderedBinaryTree &rhs) const {
+template <typename T> Tree<T> Tree<T>::operator+(const Tree &rhs) const {
 	// new tree for result of addition
-	OrderedBinaryTree result;
+	Tree result;
 	// uses private method to recursive copy values from rhs to this tree
 	result.Copy(rhs.m_pHead);
 	// copy lhs values
@@ -261,7 +261,7 @@ template <typename T> OrderedBinaryTree<T> OrderedBinaryTree<T>::operator+(const
 	return result;
 }
 
-template <typename T> void OrderedBinaryTree<T>::Subtract(Node *curr, const OrderedBinaryTree &rhs, OrderedBinaryTree &newTree) const {
+template <typename T> void Tree<T>::Subtract(Node *curr, const Tree &rhs, Tree &newTree) const {
 	if (curr != NULL) {
 		Subtract(curr->m_pLeft, rhs, newTree);
 		Subtract(curr->m_pRight, rhs, newTree);
@@ -273,16 +273,16 @@ template <typename T> void OrderedBinaryTree<T>::Subtract(Node *curr, const Orde
 	}
 }
 
-template <typename T> OrderedBinaryTree<T> OrderedBinaryTree<T>::operator-(const OrderedBinaryTree &rhs) const {
+template <typename T> Tree<T> Tree<T>::operator-(const Tree &rhs) const {
 	// create new tree for result
-	OrderedBinaryTree result;
+	Tree result;
 	// traverse this tree and check every node for same value in the rhs tree
 	Subtract(m_pHead, rhs, result);
 	// return copy of new tree
 	return result;
 }
 
-template <typename T> OrderedBinaryTree<T> &OrderedBinaryTree<T>::operator=(const OrderedBinaryTree &rhs) {
+template <typename T> Tree<T> &Tree<T>::operator=(const Tree &rhs) {
 	// check for self-assignment
 	if (this == rhs) {
 		return this;
@@ -294,7 +294,7 @@ template <typename T> OrderedBinaryTree<T> &OrderedBinaryTree<T>::operator=(cons
 	return this;
 }
 
-template <typename T> void OrderedBinaryTree<T>::ReadAllToStream(std::ostream &os, Node *curr) const {
+template <typename T> void Tree<T>::ReadAllToStream(std::ostream &os, Node *curr) const {
 	if (curr != NULL) {
 		// read current key to stream
 		os << curr->m_Key << ',';
@@ -305,7 +305,7 @@ template <typename T> void OrderedBinaryTree<T>::ReadAllToStream(std::ostream &o
 	}
 }
 
-template <typename U> std::ostream& operator<< (std::ostream &os, const OrderedBinaryTree<U> &rhs) {
+template <typename U> std::ostream& operator<< (std::ostream &os, const Tree<U> &rhs) {
 	rhs.ReadAllToStream(os, rhs.m_pHead);
 	return os;
 }
@@ -317,8 +317,8 @@ bool checkInput(std::string &input) {
 
 int  main() {
 	// create new tree
-	OrderedBinaryTree<int> tree;
-	int n;
+	Tree<double> tree;
+	double n;
 	std::string input, temp;
 	// get all input from cin
 	std::getline(std::cin, input);
@@ -329,7 +329,7 @@ int  main() {
 		// check if input isn't empty
 		if (checkInput(temp)) {
 			// convert temp string into the int value
-			n = std::stoi(temp);
+			n = std::stod(temp);
 			// and add it to the tree
 			tree.AddElement(n);
 		}
@@ -338,10 +338,10 @@ int  main() {
 	tree.ScreenOutput(2);
 
 	std::cout << tree << '\n';
-	OrderedBinaryTree<int> tree2 = tree;
+	Tree<double> tree2 = tree;
 	std::cout << tree2 << '\n';
-	OrderedBinaryTree<int> tree3 = tree + tree2;
+	Tree<double> tree3 = tree + tree2;
 	std::cout << tree3 << '\n';
-	OrderedBinaryTree<int> tree4 = tree3 - tree2;
+	Tree<double> tree4 = tree3 - tree2;
 	std::cout << tree4;
 }
