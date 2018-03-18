@@ -1,0 +1,5 @@
+This is my implementation of ordered binary tree templated class - Tree<T>.
+Constructors: create, copy and delete.
+Overloaded operators: +, -, =, <<.
+Public methods: insert, remove, search and output to screen.
+Data input in the main part for comma separated duble values.
