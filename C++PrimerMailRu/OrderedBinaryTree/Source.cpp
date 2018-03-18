@@ -319,6 +319,7 @@ bool checkInput(std::string &input) {
 	if (!input.empty()) {
 		// check all characters in the input string
 		for (int i = 0; i < input.size(); i++) {
+			// it's ok if there is dot or space character in the string
 			if (!isdigit(input[i]) && input[i] != '.' && input[i] != ' ') {
 				return false;
 			}
