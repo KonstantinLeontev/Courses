@@ -1,0 +1,18 @@
+# this line ignore all files and folders
+*
+# reinclude all directories
+!*/
+
+# reinclude vs project files
+!*.sln
+!*.vcxproj
+
+# reinclude all source and header files
+!*.cpp
+!*.h
+
+# reinclude readme files
+!README
+
+# reinclude .gitignore
+!*.gitignore 
