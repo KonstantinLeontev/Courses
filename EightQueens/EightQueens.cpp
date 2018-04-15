@@ -1,7 +1,9 @@
 #include <iostream>
 
+#define SZ 10
+
 // Fills a board with zeroes.
-void fillBoard(int** board, const int &size) {
+void fillBoard(int board[SZ][SZ], const int &size) {
 	for (int i = 0; i < size; i++) {
 		for (int j = 0; j < size; j++) {
 			board[i][j] = 0;
@@ -10,7 +12,7 @@ void fillBoard(int** board, const int &size) {
 }
 
 // Board output.
-void printBoard(int** board, const int &size, int &varCnt) {
+void printBoard(int board[SZ][SZ], const int &size, int &varCnt) {
 	std::cout << "\nSolution " << varCnt << '\n';
 	for (int i = 0; i < size; i++) {
 		for (int j = 0; j < size; j++) {
@@ -21,7 +23,7 @@ void printBoard(int** board, const int &size, int &varCnt) {
 }
 
 // Puts queen to the given place and marks others being attacked.
-void putQueen(int** board, const int &size, int i, int j) {
+void putQueen(int board[SZ][SZ], const int &size, int i, int j) {
 	// Mark that place.
 	board[i][j] = 1;
 
@@ -59,7 +61,7 @@ void putQueen(int** board, const int &size, int i, int j) {
 }
 
 // Finds the number of solutions.
-void queenPuzzle(int** board, const int &size, int i, int queenCnt, int &varCnt) {
+void queenPuzzle(int board[SZ][SZ], const int &size, int i, int queenCnt, int &varCnt) {
 	// Solution case
 	if (queenCnt == size) {
 		varCnt++;
@@ -99,13 +101,7 @@ int main() {
 		}
 		else {
 			// Make the array.
-			int** board = new int *[size];
-			for (int i = 0; i < size; i++) {
-				board[i] = new int[size];
-			}
-
-			// Fill board with zeroes.
-			fillBoard(board, size);
+			int board[SZ][SZ] = {};
 
 			// Variant's counter.
 			int varCnt = 0;
@@ -114,12 +110,6 @@ int main() {
 
 			// Output the quantity of solutions.
 			std::cout << varCnt << '\n';
-
-			// Clean up.
-			for (int i = 0; i < size; i++) {
-				delete[] board[i];
-			}
-			delete[] board;
 		}
 	}
 	return 0;
