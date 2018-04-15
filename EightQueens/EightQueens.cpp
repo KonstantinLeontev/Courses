@@ -1,18 +1,8 @@
 #include <iostream>
-
-#define SZ 10
-
-// Fills a board with zeroes.
-void fillBoard(int board[SZ][SZ], const int &size) {
-	for (int i = 0; i < size; i++) {
-		for (int j = 0; j < size; j++) {
-			board[i][j] = 0;
-		}
-	}
-}
+#include <vector>
 
 // Board output.
-void printBoard(int board[SZ][SZ], const int &size, int &varCnt) {
+void printBoard(std::vector<std::vector<int> > &board, const int &size, int &varCnt) {
 	std::cout << "\nSolution " << varCnt << '\n';
 	for (int i = 0; i < size; i++) {
 		for (int j = 0; j < size; j++) {
@@ -23,7 +13,7 @@ void printBoard(int board[SZ][SZ], const int &size, int &varCnt) {
 }
 
 // Puts queen to the given place and marks others being attacked.
-void putQueen(int board[SZ][SZ], const int &size, int i, int j) {
+void putQueen(std::vector<std::vector<int> > &board, const int &size, int i, int j) {
 	// Mark that place.
 	board[i][j] = 1;
 
@@ -61,7 +51,7 @@ void putQueen(int board[SZ][SZ], const int &size, int i, int j) {
 }
 
 // Finds the number of solutions.
-void queenPuzzle(int board[SZ][SZ], const int &size, int i, int queenCnt, int &varCnt) {
+void queenPuzzle(std::vector<std::vector<int> > board, const int &size, int i, int queenCnt, int &varCnt) {
 	// Solution case
 	if (queenCnt == size) {
 		varCnt++;
@@ -72,14 +62,13 @@ void queenPuzzle(int board[SZ][SZ], const int &size, int i, int queenCnt, int &v
 	else if (i != size) {
 		for (int j = 0; j < size; j++) {
 			if (!board[i][j]) {
-				/*if (i == 0) {
-					fillBoard(board, size);
-				}*/
-				putQueen(board, size, i, j);
+				std::vector<std::vector<int> > newBoard;
+				newBoard = board;
+				putQueen(newBoard, size, i, j);
 				// Print to the screen.
-				printBoard(board, size, varCnt);
+				printBoard(newBoard, size, varCnt);
 				// And go to the next line.
-				queenPuzzle(board, size, i + 1, queenCnt, varCnt);
+				queenPuzzle(newBoard, size, i + 1, queenCnt + 1, varCnt);
 			}
 		}
 	}	
@@ -101,7 +90,7 @@ int main() {
 		}
 		else {
 			// Make the array.
-			int board[SZ][SZ] = {};
+			std::vector<std::vector<int> > board(size, std::vector<int> (size, 0));
 
 			// Variant's counter.
 			int varCnt = 0;
