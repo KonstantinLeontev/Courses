@@ -14,9 +14,6 @@ void printBoard(std::vector<std::vector<int> > &board, const int &size, int &var
 
 // Puts queen to the given place and marks others being attacked.
 void putQueen(std::vector<std::vector<int> > &board, const int &size, int i, int j) {
-	// Mark that place.
-	board[i][j] = 1;
-
 	// Mark all squares in the same column.
 	for (int k = 0; k < size; k++) {
 		board[k][j] = 1;
@@ -65,8 +62,6 @@ void queenPuzzle(std::vector<std::vector<int> > board, const int &size, int i, i
 				std::vector<std::vector<int> > newBoard;
 				newBoard = board;
 				putQueen(newBoard, size, i, j);
-				// Print to the screen.
-				printBoard(newBoard, size, varCnt);
 				// And go to the next line.
 				queenPuzzle(newBoard, size, i + 1, queenCnt + 1, varCnt);
 			}
