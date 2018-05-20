@@ -15,7 +15,7 @@ struct Member {
 };
 
 bool input (std::string &in){
-	std::cout << "Enter a polynome or '0' to quit: ";
+	std::cout << "\nEnter a polynome or '0' to quit: ";
 	std::cin >> in;
 	if (in == "0"){
 		std::cout << "Goodbye!\n"; 
@@ -24,26 +24,52 @@ bool input (std::string &in){
 	else return true;
 }
 
-void convert(std::string &in, std::set<Member> &members){
+void convert(std::string &in, std::multiset<Member> &members){
 	// Parse the string to coefficient and powers for each member.
 	// Regex pattern for 1 member in pseudo code is (sign)(coeff)*(x)^(power).
 	std::regex reg ("(\\+|-)?(\\d*)?\\*?x\\^?(\\d*)?");
 	std::sregex_iterator iter(in.cbegin(), in.cend(), reg);
 	const std::sregex_iterator end; // Implicitly initilized to the end value.
- 
-	for (iter; iter != end; ++iter) {
-		Member m{};
+ 	std::string temp{};
 
-		m.sign = std::stoi((*iter)[0]);
-		m.coef = std::stoi((*iter)[1]);
-		m.power = std::stoi((*iter)[2]);
+	for ( ; iter != end; ++iter) {
+		Member m;
 		
+		temp = (*iter)[1].str();
+		if (temp != ""){
+			m.sign = temp[0];
+		}
+
+		temp = (*iter)[2].str();
+                if (temp != ""){
+                        m.coef = std::stoi(temp);
+                }
+
+		temp = (*iter)[3].str();
+		if (temp != ""){
+			m.power = std::stoi(temp);
+		}
+	
 		members.insert(m);
 	}
 }
 
-void output(std::set<Member> &members) {
+void output(std::multiset<Member> &members) {
 	std::set<Member>::iterator iter = members.begin();
+
+	// Output only '-' sign for the first element.
+	if ((*iter).sign == '-') {
+		std::cout << '-';
+	}
+	if ((*iter).coef > 1) {
+		std::cout << (*iter).coef << '*';
+	}
+	std::cout << 'x';
+	if ((*iter).power > 1) {
+		std::cout << (*iter).power;
+	}
+	++iter;
+
 	for (; iter != members.end(); ++iter){
 		std::cout << (*iter).sign;
 		if ((*iter).coef > 1) std::cout << (*iter).coef << '*';
@@ -56,7 +82,7 @@ int main (){
 	std::string in{};
 	
 	while (input(in)){
-		std::set<Member> members{}; 
+		std::multiset<Member> members{}; 
 
 		convert(in, members);
 		output(members); 
