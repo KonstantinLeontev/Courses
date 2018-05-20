@@ -16,3 +16,6 @@
 
 # reinclude .gitignore
 !*.gitignore 
+
+# reinclude makefiles
+!*makefile
