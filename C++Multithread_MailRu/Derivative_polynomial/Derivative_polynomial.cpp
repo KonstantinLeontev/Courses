@@ -4,13 +4,12 @@
 #include <string>
 
 struct Member {
-	Member () : sign('+'), coef(1), power(1) {}
-	Member (char s, int c, int p) : sign(s), coef(c), power(p) {}
+	Member () : coef(1), power(1) {}
+	Member (int c, int p) : coef(c), power(p) {}
 
 	bool operator<(const Member &rh) const { return power < rh.power; }
 
-	char sign;
-	int coef;
+	mutable int coef;
 	int power;
 };
 
@@ -24,57 +23,83 @@ bool input (std::string &in){
 	else return true;
 }
 
-void convert(std::string &in, std::multiset<Member> &members){
+void derivative(Member &m) {
+         m.coef *= m.power;
+         m.power--;
+}
+
+void convert(std::string &in, std::set<Member> &members){
 	// Parse the string to coefficient and powers for each member.
 	// Regex pattern for 1 member in pseudo code is (sign)(coeff)*(x)^(power).
-	std::regex reg ("(\\+|-)?(\\d*)?\\*?x\\^?(\\d*)?");
+	std::regex reg ("([\\+-]?\\d*)?\\*?x\\^?(\\d*)?");
 	std::sregex_iterator iter(in.cbegin(), in.cend(), reg);
 	const std::sregex_iterator end; // Implicitly initilized to the end value.
  	std::string temp{};
 
 	for ( ; iter != end; ++iter) {
 		Member m;
-		
-		temp = (*iter)[1].str();
-		if (temp != ""){
-			m.sign = temp[0];
-		}
 
-		temp = (*iter)[2].str();
+		// Get a coefficient.
+		temp = (*iter)[1].str();
                 if (temp != ""){
-                        m.coef = std::stoi(temp);
+			if (temp == "-") {
+				m.coef = -1;
+			}
+			else if (temp != "+") {
+                        	m.coef = std::stoi(temp);
+			}
                 }
 
-		temp = (*iter)[3].str();
+		// Get a power.
+		temp = (*iter)[2].str();
 		if (temp != ""){
 			m.power = std::stoi(temp);
 		}
-	
-		members.insert(m);
+		
+		derivative(m);
+		
+		// Check for the member that is already in the set and have the same power.
+		std::set<Member>::iterator i = members.find(m);
+		if (i != std::end(members)) {
+			// Increase the coefficient for that member.
+			i->coef += m.coef;
+		}
+		else {
+			members.insert(m);
+		}
 	}
 }
 
-void output(std::multiset<Member> &members) {
-	std::set<Member>::iterator iter = members.begin();
+void output(std::set<Member> &members) {
+	std::reverse_iterator<std::set<Member>::iterator> iter = members.rbegin();
 
-	// Output only '-' sign for the first element.
-	if ((*iter).sign == '-') {
-		std::cout << '-';
-	}
-	if ((*iter).coef > 1) {
-		std::cout << (*iter).coef << '*';
-	}
-	std::cout << 'x';
-	if ((*iter).power > 1) {
-		std::cout << (*iter).power;
-	}
-	++iter;
-
-	for (; iter != members.end(); ++iter){
-		std::cout << (*iter).sign;
-		if ((*iter).coef > 1) std::cout << (*iter).coef << '*';
-		std::cout << 'x';
-		if ((*iter).power > 1) std::cout << '^' << (*iter).power;
+	for (; iter != members.rend(); ++iter){
+		if (iter->coef) {
+			if ( iter->coef > 0) {
+				if (iter != members.rbegin()) {
+					std::cout << '+';
+				}
+				std::cout << iter->coef;
+			}
+			else if (iter->coef < -1) {
+				std::cout << iter->coef;
+			}
+			else if (iter->coef == -1) {
+				std::cout << '-';
+				if (!iter->power) {
+					std::cout << 1;
+				}
+			}
+			if (iter->power) {
+				if (iter->coef != -1) {
+					std::cout << '*';
+				}
+				std::cout << 'x';
+				if (iter->power > 1) {
+					std::cout << '^' << iter->power;
+				}
+			}
+		}
 	}
 }
 
@@ -82,7 +107,7 @@ int main (){
 	std::string in{};
 	
 	while (input(in)){
-		std::multiset<Member> members{}; 
+		std::set<Member> members{}; 
 
 		convert(in, members);
 		output(members); 
