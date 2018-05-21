@@ -103,6 +103,83 @@ void output(std::set<Member> &members) {
 	}
 }
 
+// Version for Stepik test.
+std::string sderivative(std::string polynomial){
+	std::string result{};
+	std::map<int, int> m; // Power and coefficient.
+
+	std::regex reg ("([\\+-]?\\d*)?\\*?x\\^?(\\d*)?");
+	std::sregex_iterator iter(polynomial.cbegin(), polynomial.cend(), reg);
+	const std::sregex_iterator end;
+
+	// Build a map for all members of polynomial.
+	for (; iter != end; ++iter) {
+		int power{1}, coef{1};
+
+		// Get a coefficient.
+		result = (*iter)[1].str();
+		if (result != "" && result != "+") {
+			if (result != "-") {
+				coef = std::stoi(result);
+			}
+			else {
+				coef = -1;
+			}
+		}
+
+		// Get a power.
+		result = (*iter)[2].str();
+		if (result != "") {
+			power = std::stoi(result);
+		}
+
+		// Calculate the derivative value.
+		coef *= power;
+		power--;
+
+		// Check if another member with this power value already exists.
+		std::map<int, int>::iterator i = m.find(power);
+		if (i != std::end(m)) {
+			i->second += coef;
+		}
+		else {
+			m.insert(std::map<int, int>::value_type(power, coef));
+		} 
+	}
+
+	// Build a string with derivative of polynome.
+	result = "";
+	std::reverse_iterator<std::map<int, int>::iterator> riter = m.rbegin();
+	for (; riter != m.rend(); ++riter) {
+		if (riter->second) {
+			// Coefficient part.
+			if (riter->second != -1) {
+				if (riter != m.rbegin() && riter->second > 0) {
+					result += "+";
+				}
+				result += std::to_string(riter->second);
+			}
+			else {
+				result += "-";
+				if (!riter->first) {
+					result += "1";
+				}
+			}
+			// Power part.
+			if (riter->first) {
+				if (riter->second != -1) {
+					result += "*";
+				}
+				result += "x";
+				if (riter->first > 1) {
+					result += "^" + std::to_string(riter->first);
+				}
+			}
+		}		
+	}
+return result;
+}
+
 int main (){
 	std::string in{};
 	
@@ -110,6 +187,9 @@ int main (){
 		std::set<Member> members{}; 
 
 		convert(in, members);
-		output(members); 
+		output(members);
+
+		in = sderivative(in);
+		std::cout << "\nString output: " << in;
 	} 
 }
