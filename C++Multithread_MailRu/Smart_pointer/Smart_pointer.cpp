@@ -1,42 +1,30 @@
 #include <iostream>
 
-template<typename Type>
-class SmartPointer {
-private:
-	Type* pointer;
-
+class StringPointer {
 public:
-	SmartPointer(Type* p) : pointer(p){}
-	operator Type*(){return pointer;}
-	Type *operator->(){
-		if (pointer) {
-			return pointer;
-		}
-		else {
-			std::cerr << "Bad pointer!" << std::endl;
-			return new Type;
-		}
+	std::string *operator->() {
+		if (!mPointer) mPointer = new std::string("");
+		return mPointer;
 	}
-	std::ptrdiff_t operator-(SmartPointer<Type> p) {
-		return pointer - p;
+	operator std::string*() {
+		if (!mPointer)	mPointer = new std::string("");
+		return mPointer;
 	}
+	StringPointer(std::string *Pointer) : mPointer(Pointer) {}
+	~StringPointer(){ if (*mPointer == "") delete mPointer;}
 
-	std::ptrdiff_t operator-(void *p) {
-		return pointer - p;
-	}
-};        
-
-class Foo {
 private:
-	int a, b;
-
-public:
-	Foo() : a(0), b(0){}
-	Foo(int a, int b) : a(a), b(b){}
-	int Sum(){return a + b;}
+	std::string *mPointer;
 };
 
 int main (int argc, char **argv){
-	SmartPointer<Foo> sp(NULL);
-	std::cout << sp->Sum() << std::endl;
+	std::string s1 = "Hello, world!";
+
+	StringPointer sp1(&s1);
+	StringPointer sp2(NULL);
+
+	std::cout << sp1->length() << std::endl;
+	std::cout << *sp1 << std::endl;
+	std::cout << sp2->length() << std::endl;
+	std::cout << *sp2 << std::endl;
 }
