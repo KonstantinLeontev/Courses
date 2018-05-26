@@ -1,30 +1,34 @@
 #include <iostream>
+#include <memory>
 
-class StringPointer {
-public:
-	std::string *operator->() {
-		if (!mPointer) mPointer = new std::string("");
-		return mPointer;
-	}
-	operator std::string*() {
-		if (!mPointer)	mPointer = new std::string("");
-		return mPointer;
-	}
-	StringPointer(std::string *Pointer) : mPointer(Pointer) {}
-	~StringPointer(){ if (*mPointer == "") delete mPointer;}
+struct B;
 
-private:
-	std::string *mPointer;
+struct A {
+	int value;
+	std::shared_ptr<B> b;
+	A() {std::cout << "A()" << std::endl;}
+	~A() {std::cout << "~A()" << std::endl;}
 };
 
-int main (int argc, char **argv){
-	std::string s1 = "Hello, world!";
+struct B {
+	int value;
+	std::weak_ptr<A> a;
+	B() {std::cout << "B()" << std::endl;}
+	~B() {std::cout << "~B()" << std::endl;}
+};
 
-	StringPointer sp1(&s1);
-	StringPointer sp2(NULL);
+int main(int argc, char **argv) {
+	std::shared_ptr<A> a(new A());
+	std::shared_ptr<B> b(new B());
 
-	std::cout << sp1->length() << std::endl;
-	std::cout << *sp1 << std::endl;
-	std::cout << sp2->length() << std::endl;
-	std::cout << *sp2 << std::endl;
+	a->b = b;
+	b->a = a;
+
+	a->value = 123;
+	{
+		std::shared_ptr<A> aa = b->a.lock();
+		std::cout << aa->value << std::endl;
+	}
+
+	return 0;
 }
